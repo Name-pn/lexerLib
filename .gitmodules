@@ -1,0 +1,3 @@
+[submodule "external/ParserLib"]
+	path = external/ParserLib
+	url = https://github.com/Name-pn/ParserLib.git
