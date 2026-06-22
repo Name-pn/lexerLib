@@ -1,0 +1,10 @@
+GRAMMAR
+start: S
+S -> R
+R -> R or T
+R -> T
+T -> T F
+T -> F
+F -> F asterisk
+F -> left_bracket R right_bracket
+F -> symbol
