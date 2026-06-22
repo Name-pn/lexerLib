@@ -83,4 +83,4 @@ class MultiNFA(Automation):
             if id is not None:
                 end = index_str
                 last_id = id
-        return Match(last_id, start, end) if end else None
+        return Match(last_id, start, end-1) if end else None

@@ -15,13 +15,21 @@ class RegexLexer():
                 return Terminal(self.types['LEFT_BRACKET'].name)
             case ')':
                 return Terminal(self.types['RIGHT_BRACKET'].name)
-            case c if 'a' <= c <= 'z' or 'A' <= c <= 'Z' or '0' <= c <= '9':
+            case c if 0 <= ord(c) <= 255:
                 return LTerminal(c, self.types['SYMBOL'].name)
             case _:
                 raise ValueError(f"Unknown character: {c}")
 
     def tokenize(self, string):
         res = []
-        for c in string:
-            res.append(self.get_token(c))
+        index = 0
+        while index < len(string):
+            if string[index] != "\\":
+                res.append(self.get_token(string[index]))
+            else:
+                index += 1
+                if index >= len(string):
+                    raise Exception("After \\ must be special symbol")
+                res.append(LTerminal(string[index], self.types['SYMBOL'].name))
+            index += 1
         return res
