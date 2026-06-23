@@ -41,6 +41,7 @@ class RegexNFA(Regex):
         nfa_list = []
         for id, regex in zip(self.ids, self.regex_patterns):
             tokens = self.lexer.tokenize(regex)
+            print(tokens)
             tree = self.parser.parse(tokens)
             local_nfa = nfa_builder.build(tree, id)
             nfa_list.append(local_nfa)

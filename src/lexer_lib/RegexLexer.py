@@ -2,6 +2,13 @@ from parser_lib.Symbol.LTerminal import LTerminal
 from parser_lib.Symbol.Terminal import Terminal
 
 class RegexLexer():
+    ESCAPE_MAP = {
+        'n': '\n',
+        't': '\t',
+        'r': '\r',
+        #'\\': '\\',
+    }
+
     def __init__(self, types):
         self.types = types
 
@@ -19,17 +26,26 @@ class RegexLexer():
                 return LTerminal(c, self.types['SYMBOL'].name)
             case _:
                 raise ValueError(f"Unknown character: {c}")
+            
+    def get_escape(self, c):
+        return LTerminal(c, self.types['SYMBOL'].name)
 
     def tokenize(self, string):
         res = []
         index = 0
         while index < len(string):
+            is_escape = False
             if string[index] != "\\":
-                res.append(self.get_token(string[index]))
+                char = string[index]
             else:
+                is_escape = True
                 index += 1
                 if index >= len(string):
-                    raise Exception("After \\ must be special symbol")
-                res.append(LTerminal(string[index], self.types['SYMBOL'].name))
+                    raise SyntaxError("After \\ must be symbol")
+                char = self.ESCAPE_MAP.get(string[index], string[index]) 
+            if is_escape:
+                res.append(self.get_escape(char))
+            else:
+                res.append(self.get_token(char))
             index += 1
         return res
