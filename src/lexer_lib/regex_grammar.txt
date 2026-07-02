@@ -5,6 +5,8 @@ R -> R or T
 R -> T
 T -> T F
 T -> F
-F -> F asterisk
-F -> left_bracket R right_bracket
-F -> symbol
+F -> A asterisk
+F -> A
+A -> left_bracket R right_bracket
+A -> left_curly_bracket name right_curly_bracket
+A -> symbol

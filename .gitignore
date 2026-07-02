@@ -5,3 +5,4 @@ parser
 __pycache__/
 .vscode/
 *.egg-info/
+parser_data/
