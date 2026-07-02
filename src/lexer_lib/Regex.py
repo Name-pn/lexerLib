@@ -16,7 +16,6 @@ class Regex():
         self.regex_patterns.append(line.split(":", 1)[1])
 
     def add_reg_def(self, line):
-        print(line)
         regex_var_name, regex_var_def = line.split("=", 1)
         self.regex_vars.append(regex_var_name)
         self.regex_defs.append(regex_var_def)
