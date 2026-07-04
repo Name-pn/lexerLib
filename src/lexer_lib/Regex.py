@@ -5,10 +5,16 @@ from parser_lib import LALRAnalyzerCST, LALRAnalyzerAST
 from parser_lib import Grammar
 from .Automation import Automation
 from .Match import Match
+from importlib.resources import files
 
 def delete_comments(string):
     return '\n'.join([line.strip() for line in string.split("\n") if len(line) > 0 and line[0] != '#'])
 
+def has_name(tokens):
+    for token in tokens:
+        if token.ttype == "NAME":
+            return True
+    return False
 
 class Regex():
     def add_reg_pattern(self, line):
@@ -52,8 +58,7 @@ class Regex():
                 self.vars_to_def[var] = "(" + r_def + ")"
             else:
                 raise ValueError(f"Redefine regex definition {var}")
-
-        self.grammar = Grammar.load("src/lexer_lib/regex_grammar.txt")
+        self.grammar = Grammar.load(str(files("lexer_lib").joinpath("regex_grammar.txt")))
         self.lexer = RegexLexer(self.grammar.enum)
         self.parser = LALRAnalyzerAST(self.grammar)
         self.automation = Automation()
@@ -69,6 +74,9 @@ class Regex():
         if m:
             self.index = m.end_index
         return m
+    
+    def come_back(self)->None:
+        pass
 
 
 class RegexNFA(Regex):
@@ -81,13 +89,16 @@ class RegexNFA(Regex):
         nfa_list = []
         for id, regex in zip(self.ids, self.regex_patterns):
             tokens = self.lexer.tokenize(regex)
-            tokens_after_replace = []
-            for token in tokens:
-                if token.ttype == "NAME":
-                    tokens_after_replace.extend(self.lexer.tokenize(self.vars_to_def[token.lexem]))
-                else:
-                    tokens_after_replace.append(token)    
-            tree = self.parser.parse(tokens_after_replace)
+            while has_name(tokens):
+                tokens_after_replace = []
+                for token in tokens:
+                    if token.ttype == "NAME":
+                        tokens_after_replace.extend(self.lexer.tokenize(self.vars_to_def[token.lexem]))
+                    else:
+                        tokens_after_replace.append(token)
+                tokens = tokens_after_replace
+            
+            tree = self.parser.parse(tokens)
             local_nfa = nfa_builder.build(tree, id)
             nfa_list.append(local_nfa)
         self.automation = MultiNFA(nfa_list)
