@@ -11,13 +11,16 @@ class MultiNFA(Automation):
         self.finite_states = []
         self.max_state = 0
         self.finite_state_to_id = {}
-
+        
         for nfa in nfa_list:
             offset = self.max_state + 1
             self._moveGoto(nfa, offset)
             self.max_state = nfa.max_state + offset
             self.finite_states.append(self.max_state)
             self.finite_state_to_id[self.max_state] = nfa.id
+        self.alreadyOn = [False for i in range(self.max_state + 1)]
+        self.new_states = []
+        self.old_states = []
 
     def _moveGoto(self, nfa: NFA, offset: int)->None:
         for item in nfa.goto_table.items():
@@ -33,7 +36,6 @@ class MultiNFA(Automation):
         return None
 
     def run(self, string: str):
-        self.alreadyOn = [False for i in range(self.max_state + 1)]
         self.new_states = []
         self.old_states = []
         self._addState(self.start_state)
@@ -59,16 +61,12 @@ class MultiNFA(Automation):
 
     
     def runFromIndex(self, index_str: int, string: str):
-        self.alreadyOn = [False for i in range(self.max_state + 1)]
-        self.new_states = []
-        self.old_states = []
         self._addState(self.start_state)
         char = nextChar(string, index_str)
         start = index_str
         end = None
         last_id = None
         index_str += 1
-
         while len(self.new_states) > 0:
             self.swap_stacks()
 
